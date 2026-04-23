@@ -1,0 +1,6 @@
+WARNING: ./imem.sv:35: $readmemh(test_prog.exe): Not enough words in the file for the requested range [0:63].
+VCD info: dumpfile tb_computer.vcd opened for output.
+Initializing testbench simulation...
+Success: mem[84] evaluates to 12. Arithmetic RAW Forwarding logic mapped correctly.
+Extravagant Success: mem[88] evaluates to 24. Pipelined Branch Flushes and Load-Use Stalls executed perfectly!
+tb_computer.sv:56: $finish called at 1700 (100ps)
