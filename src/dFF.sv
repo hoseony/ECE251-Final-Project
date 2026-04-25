@@ -13,11 +13,11 @@
 
 module dff(
     input  logic        clk, r,
-    input  logic [15:0] D;
-    output logic [15:0] Q;
+    input  logic [15:0] D,
+    output logic [15:0] Q
 );
 
-    always_ff @(ck) begin
+    always_ff @(posedge clk) begin
         if (r) // if reset high, 0
             Q <= 16'b0; 
         else 
@@ -25,4 +25,4 @@ module dff(
     end
 endmodule
 
-`ifndef
+`endif

@@ -3,20 +3,19 @@
 // Prof. Rob Marano
 // Author: Hoseon Yu & Evan Dong
 //
-// Sign Extension
+// SL1
 // =======================================================
 
-`ifndef SIGNEXTEND
-`define SIGNEXTEND
+`ifndef SL1
+`define SL1
 
 `timescale 1ns/100ps
 
-module signExtend(
-    input logic  [7:0]   A,
-    output logic [15:0]  Y
+module sl1(
+    input  logic [15:0] A,
+    output logic [15:0] Y
 );
-    assign Y = { {8{A[7]}}, A };
-
+    assign Y = {A[14:0], 1'b0};
 endmodule
 
 `endif

@@ -21,6 +21,10 @@ package opcode_pkg;
     *
     *  SW rd, imm8
     *    MEM[R9 + signext(imm8)] = R[rd]
+    *
+    *  --> Deviation from the proposal: I think dropping R10 to GEN or
+    *  Reserved would be better
+    *
     */
 
     parameter logic [3:0] OP_BEQ    = 4'b0100; // branch if equal
