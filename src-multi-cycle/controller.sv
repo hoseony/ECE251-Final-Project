@@ -36,6 +36,7 @@ module controller(
     output logic       memBase,
     output logic       branchSrc,
     output logic       pcEn,
+    output logic       readRd,
 
     output logic [3:0] aluCTRL
 );
@@ -45,7 +46,7 @@ module controller(
     logic branchEq, branchNe;
 
     fsm fs(
-        .clk(clk), .reset(reset), .op(opcode),
+        .clk(clk), .reset(reset), .opcode(opcode),
         .irWrite(irWrite), .mdrWrite(mdrWrite), 
         .pcWrite(pcWrite), .pcWriteCond(pcWriteCond),
         .iord(iord), .memWrite(memWrite), .regWrite(regWrite),
@@ -53,7 +54,8 @@ module controller(
         .pcSrc(pcSrc), .aluOP(aluOP), .regDst(regDst),
         .flagWrite(flagWrite), .jumpLink(jumpLink),
         .branchEq(branchEq), .branchNe(branchNe),
-        .memBase(memBase), .branchSrc(branchSrc)
+        .memBase(memBase), .branchSrc(branchSrc),
+        .readRd(readRd)
     ); 
 
 

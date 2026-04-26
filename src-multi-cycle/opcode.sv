@@ -31,9 +31,9 @@ package opcode_pkg;
     parameter logic [3:0] OP_BNE    = 4'b0101; // branch not equal
     parameter logic [3:0] OP_J      = 4'b0110; // jump
     parameter logic [3:0] OP_JAL    = 4'b0111; // jump and link, R15 as $ra
+    parameter logic [3:0] OP_LI     = 4'b1000;
 
 /*  Unused for now
-    parameter logic [3:0] OP_       = 4'b1000;
     parameter logic [3:0] OP_       = 4'b1001;
     parameter logic [3:0] OP_       = 4'b1010;
     parameter logic [3:0] OP_       = 4'b1011;
@@ -57,9 +57,8 @@ package opcode_pkg;
     parameter logic [3:0] R_SLL     = 4'b1001; // SLL
     parameter logic [3:0] R_SRL     = 4'b1010; // SRL
     parameter logic [3:0] R_MUL     = 4'b1011; // MUL (this saves things to HiLo, you need to load with MFLO or MFHI)
-
+    parameter logic [3:0] R_PASSB   = 4'b1100;
 /* Unused for now
-    parameter logic [3:0] R_        = 4'b1100;
     parameter logic [3:0] R_        = 4'b1101;
     parameter logic [3:0] R_        = 4'b1110;
     parameter logic [3:0] R_        = 4'b1111;

@@ -12,8 +12,7 @@
 `timescale 1ns/100ps
 
 `include "cpu.sv"
-`include "imem.sv"
-`include "dmem.sv"
+`include "mem.sv"
 
 module computer(
     input  logic        clk, reset,
@@ -24,32 +23,31 @@ module computer(
 );
 
     logic [15:0] pc;
-    logic [15:0] instr;
+    logic [15:0] aluOut;
     logic [15:0] readData;
+    logic [15:0] memAddress;
 
     cpu cpuUnit(
         .clk(clk),
         .reset(reset),
-        .instr(instr),
         .readData(readData),
+        .memWrite(memWrite),
         .pc(pc),
-        .aluOut(dataAddress),
+        .aluOut(aluOut),
         .writeData(writeData),
-        .memWrite(memWrite)
+        .memAddress(memAddress)
     );
 
-    imem instrMem(
-        .address(pc[6:1]),
-        .readData(instr)
-    );
+    assign dataAddress = memAddress;
 
-    dmem dataMem(
+    mem memory(
         .clk(clk),
         .memWrite(memWrite),
-        .address(dataAddress[5:0]),
+        .address(memAddress[6:1]),
         .writeData(writeData),
         .readData(readData)
     );
+
 endmodule
 
 `endif

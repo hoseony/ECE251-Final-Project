@@ -24,8 +24,8 @@ SVFILES = \
 	signExtend.sv \
 	sl1.sv \
 	registerFile.sv \
-	imem.sv \
-	dmem.sv \
+	mem.sv \
+	fsm.sv \
 	tb_computer.sv
 
 all: run

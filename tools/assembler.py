@@ -86,6 +86,7 @@ OP_BEQ   = 0x4
 OP_BNE   = 0x5
 OP_J     = 0x6
 OP_JAL   = 0x7
+OP_LI    = 0x8
 
 FUNCTS = {
     "and":  0x0,
@@ -108,6 +109,7 @@ I_TYPE_OPS = {
     "sw":   OP_SW,
     "beq":  OP_BEQ,
     "bne":  OP_BNE,
+    "li":   OP_LI,
 }
 
 J_TYPE_OPS = {
@@ -212,6 +214,16 @@ def encode_i_type(op: str, parts, labels, pc):
         # addi rd, imm8
         if len(parts) != 3:
             raise ValueError("Syntax: addi rd, imm8")
+
+        rd = get_reg(parts[1])
+        imm = check_imm8(parse_int(parts[2]))
+
+        code = (opcode << 12) | (rd << 8) | imm
+        return code
+
+    elif op == "li":
+        if len(parts) != 3:
+            raise ValueError("Syntax: li rd, imm8")
 
         rd = get_reg(parts[1])
         imm = check_imm8(parse_int(parts[2]))

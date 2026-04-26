@@ -95,6 +95,7 @@ module alu(
             4'b1000: result = a ^ b;           // XOR
             4'b1001: result = a << bShiftAmt;  // SLL
             4'b1010: result = a >> bShiftAmt;  // SRL
+            4'b1100: result = b;
 
             default: result = 16'b0;
         endcase

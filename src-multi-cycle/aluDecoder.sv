@@ -25,6 +25,7 @@ module aluDecoder(
             2'b00: aluCTRL = R_ADD; // 00: add
             2'b01: aluCTRL = R_SUB; // 01: subtract
             2'b10: aluCTRL = funct; // 10: function field
+            2'b11: aluCTRL = R_PASSB;
             
             default: aluCTRL = R_ADD;
         endcase

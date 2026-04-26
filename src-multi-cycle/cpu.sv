@@ -17,66 +17,87 @@
 module cpu(
     input  logic        clk, reset,
 
-    input  logic [15:0] instr,
     input  logic [15:0] readData,
 
     output  logic        memWrite,
     output  logic [15:0] pc,
     output  logic [15:0] aluOut,
-    output  logic [15:0] writeData
+    output  logic [15:0] writeData,
+    output  logic [15:0] memAddress
 );
     // send help...
-    logic           regWrite;
-    logic           memToReg; 
-    logic           pcSrc;
-    logic           aluSrc;
-    logic           jump;
-    logic           jumpLink;
-    logic           memBase;
-    logic           branchSrc;
-    logic [1:0]     regDst;
-    logic [3:0]     aluCTRL;
-    logic           zero;
-    logic           flagWrite;
+    logic        irWrite;
+    logic        mdrWrite;
+    logic        iord;
+    logic        regWrite;
+    logic        memToReg;
+    logic        aluSrcA;
+    logic [1:0]  aluSrcB;
+    logic [1:0]  regDst;
+    logic [1:0]  pcSrc;
+    logic        pcEn;
+
+    logic        flagWrite;
+    logic        jumpLink;
+    logic        memBase;
+    logic        branchSrc;
+    logic        readRd;
+
+    logic [3:0]  aluCTRL;
+    logic        zero;
+    logic [15:0] instrOut; 
 
     controller ctrl(
-        .opcode(instr[15:12]),
-        .funct(instr[3:0]),
+        .clk(clk),
+        .reset(reset),
+        .opcode(instrOut[15:12]),
+        .funct(instrOut[3:0]),
         .zero(zero),
-        .regWrite(regWrite),
+        .irWrite(irWrite),
+        .mdrWrite(mdrWrite),
+        .iord(iord),
         .memWrite(memWrite),
+        .regWrite(regWrite),
         .memToReg(memToReg),
+        .aluSrcA(aluSrcA),
+        .regDst(regDst),
+        .aluSrcB(aluSrcB),
         .pcSrc(pcSrc),
-        .aluSrc(aluSrc),
-        .jump(jump),
+        .flagWrite(flagWrite),
         .jumpLink(jumpLink),
         .memBase(memBase),
         .branchSrc(branchSrc),
-        .regDst(regDst),
+        .pcEn(pcEn),
         .aluCTRL(aluCTRL),
-        .flagWrite(flagWrite)
+        .readRd(readRd)
     );
 
     datapath dp(
         .clk(clk),
         .reset(reset),
+        .pcEn(pcEn),
+        .irWrite(irWrite),
+        .mdrWrite(mdrWrite),
+        .iord(iord),
         .regWrite(regWrite),
         .memToReg(memToReg),
-        .pcSrc(pcSrc),
-        .aluSrc(aluSrc),
-        .jump(jump),
         .jumpLink(jumpLink),
         .memBase(memBase),
         .branchSrc(branchSrc),
+        .aluSrcA(aluSrcA),
+        .aluSrcB(aluSrcB),
         .regDst(regDst),
+        .pcSrc(pcSrc),
         .aluCTRL(aluCTRL),
-        .instr(instr),
+        .flagWrite(flagWrite),
         .readData(readData),
         .zero(zero),
         .pc(pc),
         .aluOut(aluOut),
         .writeData(writeData),
-        .flagWrite(flagWrite)
+        .memAddress(memAddress),
+        .instrOut(instrOut),
+        .readRd(readRd)
     );
 
 endmodule
