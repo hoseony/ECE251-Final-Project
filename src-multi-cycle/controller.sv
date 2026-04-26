@@ -11,54 +11,59 @@
 
 `timescale 1ns/100ps
 
+`include "fsm.sv"
+`include "aluDecoder.sv"
+
 module controller(
+    input  logic       clk, reset,
     input  logic [3:0] opcode,
     input  logic [3:0] funct,
     input  logic       zero,
 
-    output logic       regWrite,
+    output logic       irWrite,
+    output logic       mdrWrite,
+    output logic       iord,
     output logic       memWrite,
+    output logic       regWrite,
     output logic       memToReg,
-    output logic       pcSrc,
-    output logic       aluSrc,
-    output logic       jump,
+    output logic       aluSrcA,
+    output logic [1:0] regDst,
+    output logic [1:0] aluSrcB,
+    output logic [1:0] pcSrc,
+
+    output logic       flagWrite,
     output logic       jumpLink,
     output logic       memBase,
     output logic       branchSrc,
-    output logic [1:0] regDst,
-    output logic [3:0] aluCTRL,
-    output logic       flagWrite
+    output logic       pcEn,
+
+    output logic [3:0] aluCTRL
 );
 
     logic [1:0] aluOP;
+    logic pcWrite, pcWriteCond;
     logic branchEq, branchNe;
 
-    mainDecoder md(
-        .opcode(opcode),
-        .regWrite(regWrite),
-        .memWrite(memWrite),
-        .memToReg(memToReg),
-        .aluSrc(aluSrc),
-        .branchEq(branchEq),
-        .branchNe(branchNe),
-        .jump(jump),
-        .jumpLink(jumpLink),
-        .memBase(memBase),
-        .branchSrc(branchSrc),
-        .regDst(regDst),
-        .aluOP(aluOP),
-        .flagWrite(flagWrite)
-    );
+    fsm fs(
+        .clk(clk), .reset(reset), .op(opcode),
+        .irWrite(irWrite), .mdrWrite(mdrWrite), 
+        .pcWrite(pcWrite), .pcWriteCond(pcWriteCond),
+        .iord(iord), .memWrite(memWrite), .regWrite(regWrite),
+        .memToReg(memToReg), .aluSrcA(aluSrcA), .aluSrcB(aluSrcB),
+        .pcSrc(pcSrc), .aluOP(aluOP), .regDst(regDst),
+        .flagWrite(flagWrite), .jumpLink(jumpLink),
+        .branchEq(branchEq), .branchNe(branchNe),
+        .memBase(memBase), .branchSrc(branchSrc)
+    ); 
 
-    // aluOP from mainDecoder --> aluDecoder
-    
+
     aluDecoder ad(
         .aluOP(aluOP),
         .funct(funct),
         .aluCTRL(aluCTRL)
     );
 
-    assign pcSrc = (branchEq & zero) | (branchNe & ~zero);
+    assign pcEn = pcWrite | (pcWriteCond & ((branchEq & zero) | (branchNe & ~zero)));
 endmodule
 
 `endif

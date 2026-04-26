@@ -25,12 +25,12 @@ module fsm (
     output logic        memWrite,    // 1: write to a memory (sw)
     output logic        regWrite,    // 1: write to register
     output logic        memToReg,    // 1: data from memory | 0: data fromregister
-    output logic        aluSrca,     // 0: pc | 1: A register
+    output logic        aluSrcA,     // 0: pc | 1: A register
 
     output logic [1:0]  regDst,      // 00: Accumulator | 01: rd field (I-type) | 10: R15 $ra
-    output logic [1:0]  aluSrcb,     // 00: register B | 01: constant 2
+    output logic [1:0]  aluSrcB,     // 00: register B | 01: constant 2
                                      // 10: output of sign extend | 11: signImmSh (sign immediate shift < 1)
-    output logic [1:0]  pcSource,    // 00: output of ALU to pc | 01: aluOutReg | 10: jump
+    output logic [1:0]  pcSrc,    // 00: output of ALU to pc | 01: aluOutReg | 10: jump
     output logic [1:0]  aluOP,       // 00: add | 01: sub | 10: funct
 
     output logic        flagWrite,   // 
@@ -96,36 +96,37 @@ module fsm (
     // output logic
     always_comb begin
         // default
-        irWrite = mdrWrite = pcWriteCond = iord = memToReg = aluSrca = 0;
+        irWrite = mdrWrite = pcWriteCond = iord = memToReg = aluSrcA = 0;
         flagWrite = jumpLink = branchEq = branchNe = memBase = branchSrc = 0;
-        regDst = aluSrcb = pcSource = aluOP = 2'b00;
+        regDst = aluSrcB = pcSrc = aluOP = 2'b00;
 
         case (state)
             // send help, this is too much to write comments 
             FETCH: begin
                 irWrite = 1;
                 pcWrite = 1;
-                aluSrca = 0;
-                aluSrcb = 2'b01;
+                aluSrcA = 0;
+                aluSrcB = 2'b01;
                 aluOP   = 2'b00;
                 pcSrc   = 2'b00;
             end
 
             DECODE: begin
-                aluSrca = 0;
-                aluSrcb = 2'b11;
+                aluSrcA = 0;
+                aluSrcB = 2'b11;
                 memBase = (op == OP_LW  || op == OP_SW); 
                 branchSrc = (op == OP_BEQ || op == OP_BNE);
             end
 
             MEMADR: begin
-                aluSrca = 1;
-                aluSrcb = 2'b10;
+                aluSrcA = 1;
+                aluSrcB = 2'b10;
                 aluOP   = 2'b00;
             end
 
             MEMREAD: begin
                 iord = 1;
+                mdrWrite = 1;
             end
 
             MEMWB: begin
@@ -140,8 +141,8 @@ module fsm (
             end
 
             EXECUTER: begin
-                aluSrca = 1;
-                aluSrcb = 2'b00;
+                aluSrcA = 1;
+                aluSrcB = 2'b00;
                 aluOP = 2'b10;
                 flagWrite = 1;
             end
@@ -153,8 +154,8 @@ module fsm (
 
             // Branch compare R0 and rd (idk if I like it)
             BRANCH: begin
-                aluSrca = 1;
-                aluSrcb = 2'b00;
+                aluSrcA = 1;
+                aluSrcB = 2'b00;
                 aluOP = 2'b01;
                 pcWriteCond = 1;
                 pcSrc = 2'b01;
@@ -163,8 +164,8 @@ module fsm (
             end
 
             ADDIEXEC: begin
-                aluSrca = 0;
-                aluSrcb = 2'b10;
+                aluSrcA = 0;
+                aluSrcB = 2'b10;
                 aluOP = 2'b00;
             end
 
