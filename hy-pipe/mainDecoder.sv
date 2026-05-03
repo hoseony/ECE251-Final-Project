@@ -11,6 +11,8 @@
 
 `timescale 1ns/100ps
 
+`include "opcode.sv"
+
 module maindec(
     input  logic [3:0] op,
 
@@ -29,8 +31,6 @@ module maindec(
     output logic       flagWrite
 );
 
-    import opcode_pkg::*;
-
     logic [14:0] controls;
 
     assign {regWrite, memWrite, memToReg, aluSrc,
@@ -41,15 +41,22 @@ module maindec(
     always_comb begin
         case (op)
             //                     rW mW mR aS  rD  aO  br bN  j jL mB bS fW
-            OP_RTYPE: controls = 15'b1_0_0_0_00_10_0_0_0_0_0_0_1;
-            OP_ADDI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_0;
-            OP_LW:    controls = 15'b1_0_1_1_01_00_0_0_0_0_1_0_0;
-            OP_SW:    controls = 15'b0_1_0_1_00_00_0_0_0_0_1_0_0;
-            OP_BEQ:   controls = 15'b0_0_0_0_00_01_1_0_0_0_0_1_0;
-            OP_BNE:   controls = 15'b0_0_0_0_00_01_0_1_0_0_0_1_0;
-            OP_J:     controls = 15'b0_0_0_0_00_00_0_0_1_0_0_0_0;
-            OP_JAL:   controls = 15'b1_0_0_0_10_00_0_0_1_1_0_0_0;
-            OP_LI:    controls = 15'b1_0_0_1_01_11_0_0_0_0_0_0_0;
+            `OP_RTYPE: controls = 15'b1_0_0_0_00_10_0_0_0_0_0_0_1;
+            `OP_ADDI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_0;
+            `OP_LW:    controls = 15'b1_0_1_1_01_00_0_0_0_0_1_0_0;
+            `OP_SW:    controls = 15'b0_1_0_1_00_00_0_0_0_0_1_0_0;
+            `OP_BEQ:   controls = 15'b0_0_0_0_00_01_1_0_0_0_0_1_0;
+            `OP_BNE:   controls = 15'b0_0_0_0_00_01_0_1_0_0_0_1_0;
+            `OP_J:     controls = 15'b0_0_0_0_00_00_0_0_1_0_0_0_0;
+            `OP_JAL:   controls = 15'b1_0_0_0_10_00_0_0_1_1_0_0_0;
+            `OP_LI:    controls = 15'b1_0_0_1_01_11_0_0_0_0_0_0_0;
+            `OP_ANDI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
+            `OP_ORI:   controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
+            `OP_XORI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
+            `OP_SLTI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
+            `OP_LUI:   controls = 15'b1_0_0_1_01_11_0_0_0_0_0_0_0;
+            `OP_HALT:  controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
+            `OP_NOP:   controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
             default:  controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
         endcase
     end

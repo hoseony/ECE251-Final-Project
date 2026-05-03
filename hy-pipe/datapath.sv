@@ -9,12 +9,14 @@
 `ifndef DATAPATH
 `define DATAPATH
 
+
 `include "alu.sv"
 `include "registerFile.sv"
 `include "mux2.sv"
 `include "mux4.sv"
 `include "signExtend.sv"
 `include "sl1.sv"
+`include "opcode.sv"
 
 `timescale 1ns/100ps
 
@@ -58,6 +60,7 @@ module datapath(
     // Exception handling
     input  logic        Exception_Flag
 );
+
     // IF (instruction fetch):  send PC to imem, get instruction, compute pc+2, decide what pcNext is
     // ID (instruction decode): decode instruction field (opcode, rs, rt, rd, imm)
     //                          read register file (get values), sign extend,
@@ -94,13 +97,13 @@ module datapath(
     always_ff @(posedge clk or posedge reset) begin 
         if (reset || flushD) begin
             // flushD comes from hazard unit for exceptions
-            instrD      <= 16'b0;
+            instrD      <= 16'hF000;
             pcPlus2D    <= 16'b0;
         end else if(~stallD) begin
             // if branch or jump, insert we need to zero the instrD because
             // the next instruction that got fetched is wrong
             // Though, we still need pcPlus2D because of the jump logic
-            instrD      <= (pcSrcD || pcSrcNeD || jumpD) ? 16'b0 : instrF;
+            instrD      <= (pcSrcD || pcSrcNeD || jumpD) ? 16'hF000 : instrF;
             pcPlus2D    <= pcPlus2F;
         end
     end
@@ -142,6 +145,9 @@ module datapath(
     
     signExtend se(.A(instrD[7:0]), .Y(signImmD));
     sl1        immsh(.A(signImmD), .Y(signImmShD));
+    
+    logic [15:0] aluImmD;
+    assign aluImmD = (instrD[15:12] == `OP_LUI) ? {instrD[7:0], 8'b0} : signImmD;
 
     assign pcJumpFD = {pcPlus2D[15:13], instrD[11:0], 1'b0};
     assign pcNextBrFD = pcPlus2D + signImmShD;
@@ -199,7 +205,7 @@ module datapath(
         end else if (~stallE) begin
             srcaE       <= srcaD;
             srcbE       <= srcbD;
-            signImmE    <= signImmD;
+            signImmE    <= aluImmD;
             pcPlus2E    <= pcPlus2D;
 
             rsE         <= rsD;

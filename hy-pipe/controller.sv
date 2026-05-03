@@ -11,7 +11,6 @@
 
 `timescale 1ns/100ps
 
-`include "opcode.sv"
 `include "mainDecoder.sv"
 `include "aluDecoder.sv"
 
@@ -53,6 +52,7 @@ module controller(
     );
 
     aluDecoder ad(
+        .op(op),
         .aluOP(aluOP),
         .funct(funct),
         .aluCTRL(aluCTRL)
