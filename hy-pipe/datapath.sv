@@ -72,15 +72,18 @@ module datapath(
     
     logic [15:0] pcNextFD, pcPlus2F, pcNextBrFD, pcJumpFD;
     logic pcSrcD, pcSrcNeD; //for BEQ and BNE
-
+    logic jrD;
+    
     logic [15:0] pcPlus2D;
 
     assign pcPlus2F = pcF + 16'd2;  // next PC (default)
-
+    assign jrD = (instrD[15:12] == `OP_JR);
+    
     // This determines what will be our next PC
     always_comb begin
         if (Exception_Flag)          pcNextFD = 16'hFF00; // for now, let's move it here
         else if (jumpD)              pcNextFD = pcJumpFD;
+        else if (jrD)                pcNextFD = comparaD;
         else if (pcSrcD || pcSrcNeD) pcNextFD = pcNextBrFD;
         else                         pcNextFD = pcPlus2F;
     end
@@ -103,7 +106,7 @@ module datapath(
             // if branch or jump, insert we need to zero the instrD because
             // the next instruction that got fetched is wrong
             // Though, we still need pcPlus2D because of the jump logic
-            instrD      <= (pcSrcD || pcSrcNeD || jumpD) ? 16'hF000 : instrF;
+            instrD      <= (pcSrcD || pcSrcNeD || jumpD || jrD) ? 16'hF000 : instrF;
             pcPlus2D    <= pcPlus2F;
         end
     end
@@ -125,6 +128,7 @@ module datapath(
     always_comb begin
         if (membaseD)        readReg1D = 4'd9;         // LW/SW R9 is the base pointer
         else if (branchsrcD) readReg1D = 4'd0;         // BEQ/BNE compare against R0
+        else if (jrD)        readReg1D = instrD_rd;
         else if (alusrcD)    readReg1D = instrD_rd; // ADDI/LI rd is part of the source
         else                 readReg1D = instrD_rs;  // R-type rs field
     end

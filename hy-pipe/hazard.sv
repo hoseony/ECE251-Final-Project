@@ -86,6 +86,17 @@ module hazard(
         (memtoregM && (writeregM == rsD || writeregM == rtD))
     ));
 
+    always_comb begin
+        forwardaD = 1'b0;
+        forwardbD = 1'b0;
+
+        if (regwriteM && (rsD == writeregM))
+            forwardaD = 1'b1;
+
+        if (regwriteM && (rtD == writeregM))
+            forwardbD = 1'b1;
+    end
+
     // stall fluch
     // stall IF and ID when load-use or branch hazard
     assign stallF = lwstall || branchstall;

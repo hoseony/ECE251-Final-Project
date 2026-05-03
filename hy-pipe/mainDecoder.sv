@@ -55,9 +55,9 @@ module maindec(
             `OP_XORI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
             `OP_SLTI:  controls = 15'b1_0_0_1_01_00_0_0_0_0_0_0_1;
             `OP_LUI:   controls = 15'b1_0_0_1_01_11_0_0_0_0_0_0_0;
-            `OP_HALT:  controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
+            `OP_JR:    controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
             `OP_NOP:   controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
-            default:  controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
+            default:   controls = 15'b0_0_0_0_00_00_0_0_0_0_0_0_0;
         endcase
     end
 endmodule

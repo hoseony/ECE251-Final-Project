@@ -18,13 +18,16 @@ module imem(
 
     logic [15:0] RAM [0:63]; //2^6 = 64, 64-1
 
-    initial
-    begin
-      // read memory in hex format from file 
-      $readmemh("../programs/program", RAM);
+    integer i;
+
+    initial begin
+        for (i = 0; i < 64; i = i + 1)
+            RAM[i] = 16'hF000;   // NOP
+
+        $readmemh("../programs/program", RAM);
     end
 
-  assign readData = RAM[address]; // word aligned
+    assign readData = RAM[address]; // word aligned
 
 endmodule
 
