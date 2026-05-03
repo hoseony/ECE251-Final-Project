@@ -17,10 +17,10 @@ output logic [15:0] id_pc_plus2,
 output logic [15:0] id_instr
 );
 
-Dff #(16) pc_reg(//register that store pc +2
+dff #(16) pc_reg(//register that store pc +2
     .clk(clk),
     .reset(reset),
-    .enabe(enable),
+    .enable(enable),
     .flush(flush),
     .D(if_pc_plus2),
     .Q(id_pc_plus2)
@@ -28,11 +28,11 @@ Dff #(16) pc_reg(//register that store pc +2
 dff #(16) instr_reg(
     .clk(clk),
     .reset(reset),
-    .enabe(enable),
+    .enable(enable),
     .flush(flush),
     .D(if_instr),
     .Q(id_instr)
-)
+);
 
 endmodule
 

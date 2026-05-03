@@ -18,3 +18,5 @@ module dff #(parameter WIDTH = 16) (
             Q <= D;
     end
 endmodule
+
+`endif
