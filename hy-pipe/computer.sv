@@ -28,16 +28,19 @@ module computer(
     logic [15:0] aluoutM;   // ALU result = data memory address
     logic [15:0] readdataM; // data read from dmem (LW)
 
+    logic memreadM, dmem_ready, mem_stall;
+    assign mem_stall = (memreadM || memwrite) && !dmem_ready;
+
     cpu cpuUnit(
         .clk(clk), .reset(reset),
         .Exception_Flag(Exception_Flag),
-        .pcF(pcF),
-        .instrF(instrF),
-        .memwriteM(memwrite),
+        .mem_stall(mem_stall),
+        .pcF(pcF), .instrF(instrF),
+        .memwriteM(memwrite), .memreadM(memreadM),
         .aluoutM(aluoutM),
-        .writedataM(writedata),
-        .readdataM(readdataM)
+        .writedataM(writedata), .readdataM(readdataM)
     );
+
 
     assign dataaddr = aluoutM;
 
@@ -48,9 +51,12 @@ module computer(
 
     dmem dmemUnit(
         .clk(clk),
+        .reset(reset),
+        .memRead(memreadM),
         .memWrite(memwrite),
         .address(aluoutM),
         .writeData(writedata),
+        .dmem_ready(dmem_ready),
         .readData(readdataM)
     );
 

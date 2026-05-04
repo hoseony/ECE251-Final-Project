@@ -16,14 +16,15 @@
 `include "hazard.sv"
 
 module cpu(
-    input  logic        clk, reset, Exception_Flag,
+    input  logic        clk, reset, Exception_Flag, mem_stall,
     
     output logic [15:0] pcF,
     input  logic [15:0] instrF,
 
     output logic        memwriteM,
     output logic [15:0] aluoutM, writedataM,
-    input  logic [15:0] readdataM
+    input  logic [15:0] readdataM,
+    output logic        memreadM
 );
 
     logic        regwriteD, memwriteD, memtoregD;
@@ -44,6 +45,8 @@ module cpu(
     logic        regwriteE, regwriteM, regwriteW;
     logic        memtoregE, memtoregM;
     logic [15:0] instrD;
+
+    assign memreadM = memtoregM;
 
     controller ctrl(
         .op(instrD[15:12]),      // opcode field
@@ -93,6 +96,7 @@ module cpu(
         .writeregE(writeregE), .writeregM(writeregM), .writeregW(writeregW),
         .regwriteE(regwriteE), .regwriteM(regwriteM), .regwriteW(regwriteW),
         .memtoregE(memtoregE), .memtoregM(memtoregM),
+        .mem_stall(mem_stall),
         .branchD(branchD), .branchneD(branchneD),
         .Exception_Flag(Exception_Flag),
         .forwardaD(forwardaD), .forwardbD(forwardbD),

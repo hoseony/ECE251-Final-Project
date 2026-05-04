@@ -48,7 +48,10 @@ module hazard(
     output logic stallF, stallD, stallE, stallM, stallW,
 
     // flush signals
-    output logic flushD, flushE
+    output logic flushD, flushE,
+
+    // stalling for dmem
+    input logic mem_stall
 );
 
     // forwarding to EX stage
@@ -99,18 +102,18 @@ module hazard(
 
     // stall fluch
     // stall IF and ID when load-use or branch hazard
-    assign stallF = lwstall || branchstall;
-    assign stallD = lwstall || branchstall;
+    assign stallF = lwstall || branchstall || mem_stall;
+    assign stallD = lwstall || branchstall || mem_stall;
 
     // EX/MEM/WB doesn't need to stall
-    assign stallE = 1'b0;
-    assign stallM = 1'b0;
-    assign stallW = 1'b0;
+    assign stallE = mem_stall;
+    assign stallM = mem_stall;
+    assign stallW = mem_stall;
 
-    assign flushD = Exception_Flag;
+    assign flushD = Exception_Flag && !mem_stall;
 
     // flushE : bubble into ID/EX
-    assign flushE = lwstall || branchstall || Exception_Flag;
+    assign flushE = (lwstall || branchstall || Exception_Flag) && !mem_stall;
 
 endmodule
 

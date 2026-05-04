@@ -75,23 +75,32 @@ module tb_computer;
 
     task print_header;
         $display("");
-        $display("================================================================================================================================================================================");
-        $display("cyc | pcF  | instrF | name  | instrD | name  | aluoutM | wdataM | mw | R0   R1   R2   R3   R4   R5   R9   R12  R15  | fwdD | stallF stallD flushE");
-        $display("================================================================================================================================================================================");
+        $display("========================================================================================================================================================================================");
+        $display("cyc | pcF  | instrF | name  | instrD | name  | aluoutM | wdataM | mw mr | ready mstall | R0   R1   R2   R3   R4   R5   R9   R12  R15  | fwdD | stallF stallD stallE stallM stallW flushE");
+        $display("========================================================================================================================================================================================");
     endtask
 
     task print_row(input int cycle);
         $display(
-            "%3d | %04h | %04h   | %-5s | %04h   | %-5s | %04h    | %04h   | %1b  | %04h %04h %04h %04h %04h %04h %04h %04h %04h | %1b%1b   |   %1b      %1b      %1b",
+            "%3d | %04h | %04h   | %-5s | %04h   | %-5s | %04h    | %04h   | %1b  %1b |   %1b      %1b   | %04h %04h %04h %04h %04h %04h %04h %04h %04h | %1b%1b   |   %1b      %1b      %1b      %1b      %1b      %1b",
             cycle,
+
+            // Fetch / Decode
             dut.cpuUnit.pcF,
             dut.cpuUnit.instrF,
             instr_name(dut.cpuUnit.instrF),
             dut.cpuUnit.dp.instrD,
             instr_name(dut.cpuUnit.dp.instrD),
+
+            // Memory stage
             dut.cpuUnit.dp.aluoutM,
             dut.cpuUnit.dp.writedataM,
             dut.memwrite,
+            dut.memreadM,
+            dut.dmem_ready,
+            dut.mem_stall,
+
+            // Registers
             dut.cpuUnit.dp.rf.registers[0],
             dut.cpuUnit.dp.rf.registers[1],
             dut.cpuUnit.dp.rf.registers[2],
@@ -101,10 +110,15 @@ module tb_computer;
             dut.cpuUnit.dp.rf.registers[9],
             dut.cpuUnit.dp.rf.registers[12],
             dut.cpuUnit.dp.rf.registers[15],
+
+            // Forwarding / stalls / flush
             dut.cpuUnit.dp.forwardaD,
             dut.cpuUnit.dp.forwardbD,
             dut.cpuUnit.hu.stallF,
             dut.cpuUnit.hu.stallD,
+            dut.cpuUnit.hu.stallE,
+            dut.cpuUnit.hu.stallM,
+            dut.cpuUnit.hu.stallW,
             dut.cpuUnit.hu.flushE
         );
     endtask
@@ -129,7 +143,7 @@ module tb_computer;
             print_row(cycle);
         end
 
-        $display("================================================================================================================================================================================");
+        $display("========================================================================================================================================================================================");
         $finish;
     end
 
@@ -139,9 +153,18 @@ module tb_computer;
         $finish;
     end
 
+    // This prints only when the delayed memory operation actually finishes.
     always @(negedge clk) begin
-        if (memwrite)
-            $display("  --> SW: MEM[%04h] = %04h", dataaddr, writedata);
+        if (dut.dmem_ready && dut.memwrite) begin
+            $display("  --> SW COMMIT: MEM[%04h] = %04h", dataaddr, writedata);
+        end
+    end
+
+    // Optional: print when a load completes too.
+    always @(negedge clk) begin
+        if (dut.dmem_ready && dut.memreadM) begin
+            $display("  --> LW COMPLETE: MEM[%04h] -> %04h", dataaddr, dut.dmemUnit.readData);
+        end
     end
 
 endmodule
