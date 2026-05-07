@@ -119,14 +119,16 @@ iverilog -g2012 -o sim tb_computer.sv
 ./sim
 ```
 
+#### GTKwave
+in `pipelined-computer` directory, after compilation
+```bash
+gtkwave ./tb_computer.vcd
+```
 
 ## Timing Diagram
-
-### R & I type
-The following image shows timing diagram of the following instructions
-
 ![TimingDiagramR-I](/assets-readme/timing-diagram-R-I.png)
 
+The following image shows timing diagram of the following instructions.
 ```asm
 li r1, 5
 li r2, 3
@@ -142,9 +144,3 @@ which translates into
 0212
 6003
 ```
-
-
-
-
-
-
