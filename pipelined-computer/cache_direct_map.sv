@@ -26,7 +26,13 @@ module cache_directMapped(
     output logic        mem_write,
     output logic        mem_read,
     input  logic [15:0] mem_readdata,
-    input  logic        mem_ready
+    input  logic        mem_ready,
+
+    // for gtkwave
+    output logic        dbg_hit,
+    output logic [1:0]  dbg_state,
+    output logic [2:0]  dbg_index,
+    output logic [11:0] dbg_tag
 );
 
 // ------- Cache structure ------- 
@@ -49,6 +55,11 @@ logic hit, miss;
 assign hit = validArray[index] && (tagArray[index] == tag);
 assign miss = (memread || memwrite) && !hit;
 assign readdata = hit ? dataArray[index] : 16'bx;
+
+assign dbg_hit   = hit;
+assign dbg_state = state;
+assign dbg_index = addrIndex;
+assign dbg_tag   = addrTag;
 
 // ------- Main Memory & FSM logic -------
 typedef enum logic { IDLE, FETCHING } state_t;

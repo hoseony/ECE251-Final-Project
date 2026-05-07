@@ -120,4 +120,31 @@ iverilog -g2012 -o sim tb_computer.sv
 ```
 
 
+## Timing Diagram
+
+### R & I type
+The following image shows timing diagram of the following instructions
+
+[TimingDiagraR-I](../assets-readme/timing-diagram-R-I.png)
+
+```asm
+li r1, 5
+li r2, 3
+add r1, r2
+halt:
+j halt
+```
+
+which translates into
+```asm
+8105
+8203
+0212
+6003
+```
+
+
+
+
+
 

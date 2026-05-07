@@ -28,6 +28,12 @@ module computer(
     logic [15:0] aluoutM;   // ALU result = data memory address
     logic [15:0] readdataM; // data read from dmem (LW)
 
+    // gtkwave cache signals
+    logic        dcache_hit;
+    logic [1:0]  dcache_state;
+    logic [2:0]  dcache_index;
+    logic [11:0] dcache_tag;
+
     logic memreadM, dmem_ready, mem_stall;
     assign mem_stall = (memreadM || memwrite) && !dmem_ready;
 

@@ -31,24 +31,24 @@ module dmem #(parameter LATENCY = 5)(
     logic [3:0] delayCounter;
 
 
-    always_ff @(posedge clk) begin
+    always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
-            delayCounter <= 0;
-            dmem_ready <= 0;
+            delayCounter <= 4'b0;
+            dmem_ready <= 1'b0;
         end else begin
             if (memRead || memWrite) begin
                 if (delayCounter == LATENCY - 1) begin
-                    dmem_ready <= 1;
-                    delayCounter <= 0;
+                    dmem_ready <= 1'b0;
+                    delayCounter <= 4'b0;
                     if (memWrite)
                         RAM[address[6:1]] <= writeData;
                 end else begin
                     dmem_ready <= 0;
-                    delayCounter <= delayCounter + 1;
+                    delayCounter <= delayCounter + 1'b0;
                 end
             end else begin
-                dmem_ready <= 0;
-                delayCounter <= 0;
+                dmem_ready <= 1'b1;
+                delayCounter <= 4'b0;
             end
         end
     end

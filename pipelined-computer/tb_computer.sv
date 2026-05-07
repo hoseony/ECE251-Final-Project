@@ -21,6 +21,15 @@ module tb_computer;
         .memwrite(memwrite)
     );
 
+    logic [15:0] R0, R1, R2, R9, R12, R15;
+
+    assign R0  = dut.cpuUnit.dp.rf.registers[0];
+    assign R1  = dut.cpuUnit.dp.rf.registers[1];
+    assign R2  = dut.cpuUnit.dp.rf.registers[2];
+    assign R9  = dut.cpuUnit.dp.rf.registers[9];
+    assign R12 = dut.cpuUnit.dp.rf.registers[12];
+    assign R15 = dut.cpuUnit.dp.rf.registers[15];
+
     initial clk = 0;
     always #5 clk = ~clk;
 
