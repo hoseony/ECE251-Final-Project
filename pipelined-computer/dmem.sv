@@ -11,43 +11,46 @@
 
 `timescale 1ns/100ps
 
-module dmem #(parameter LATENCY = 5)( 
-    input  logic         clk, reset, memRead, memWrite, // write Enable
+module dmem #(parameter LATENCY = 5)(
+    input  logic         clk, reset,
+
+    input  logic         memRead,
+    input  logic         memWrite,
+
     input  logic [15:0]  address,
-    // address to store (in dmem) 
-    // * this does not really need to match with imem size but for simplicity
-    input  logic [15:0]  writeData,    // Data to store
+    input  logic [15:0]  writeData,
+
     output logic         dmem_ready,
-    output logic [15:0]  readData      // loading data from memory
+    output logic [15:0]  readData
 );
 
-    logic [15:0] RAM [0:63]; //2^6 = 64, 64-1
+    logic [15:0] RAM [0:63];
 
     initial begin
         for (int i = 0; i < 64; i = i + 1)
             RAM[i] = 16'b0;
     end
- 
-    logic [3:0] delayCounter;
 
+    logic [3:0] delayCounter;
+    logic       memBusy;
+
+    assign memBusy = memRead || memWrite;
+    assign dmem_ready = !memBusy || (delayCounter == LATENCY - 1);
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
             delayCounter <= 4'b0;
-            dmem_ready <= 1'b0;
         end else begin
-            if (memRead || memWrite) begin
+            if (memBusy) begin
                 if (delayCounter == LATENCY - 1) begin
-                    dmem_ready <= 1'b0;
-                    delayCounter <= 4'b0;
                     if (memWrite)
                         RAM[address[6:1]] <= writeData;
+
+                    delayCounter <= 4'b0;
                 end else begin
-                    dmem_ready <= 0;
-                    delayCounter <= delayCounter + 1'b0;
+                    delayCounter <= delayCounter + 1'b1;
                 end
             end else begin
-                dmem_ready <= 1'b1;
                 delayCounter <= 4'b0;
             end
         end
