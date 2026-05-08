@@ -58,7 +58,9 @@ module datapath(
     output logic        memtoregE, memtoregM,
 
     // Exception handling
-    input  logic        Exception_Flag
+    input  logic        Exception_Flag,
+
+    output logic jrD
 );
 
     // IF (instruction fetch):  send PC to imem, get instruction, compute pc+2, decide what pcNext is
@@ -72,7 +74,6 @@ module datapath(
     
     logic [15:0] pcNextFD, pcPlus2F, pcNextBrFD, pcJumpFD;
     logic pcSrcD, pcSrcNeD; //for BEQ and BNE
-    logic jrD;
     
     logic [15:0] pcPlus2D;
 
@@ -163,12 +164,25 @@ module datapath(
     logic [15:0] comparaD, comparbD; // values being compared 
 
     // values from register file, values forwarded from MEM stage , forwardaD, comparaD
-    mux2 #(16) fwdadmux(.d0(srcaD), .d1(aluoutM), .s(forwardaD), .data_out(comparaD));
-    mux2 #(16) fwdbdmux(.d0(srcbD), .d1(aluoutM), .s(forwardbD), .data_out(comparbD));
+    logic [15:0] forwardResultM;
 
-    // making signals for branches
-    assign pcSrcD = branchD & (comparaD == comparbD); //BEQ
-    assign pcSrcNeD = branchneD & (comparaD != comparbD); //BNE
+    assign forwardResultM = memtoregM ? readdataM : aluoutM;
+
+    mux2 #(16) fwdadmux(
+        .d0(srcaD),
+        .d1(forwardResultM),
+        .s(forwardaD),
+        .data_out(comparaD)
+    );
+
+    mux2 #(16) fwdbdmux(
+        .d0(srcbD),
+        .d1(forwardResultM),
+        .s(forwardbD),
+        .data_out(comparbD)
+    );    // making signals for branches
+        assign pcSrcD = branchD & (comparaD == comparbD); //BEQ
+        assign pcSrcNeD = branchneD & (comparaD != comparbD); //BNE
 
     // EPC
     // save the PC if exception

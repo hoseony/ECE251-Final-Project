@@ -45,6 +45,7 @@ module cpu(
     logic        regwriteE, regwriteM, regwriteW;
     logic        memtoregE, memtoregM;
     logic [15:0] instrD;
+    logic jrD;
 
     assign memreadM = memtoregM;
 
@@ -88,7 +89,7 @@ module cpu(
         .writeregE(writeregE), .writeregM(writeregM), .writeregW(writeregW),
         .regwriteE(regwriteE), .regwriteM(regwriteM), .regwriteW(regwriteW),
         .memtoregE(memtoregE), .memtoregM(memtoregM),
-        .Exception_Flag(Exception_Flag)
+        .Exception_Flag(Exception_Flag), .jrD(jrD)
     );
 
     hazard hu(
@@ -103,7 +104,7 @@ module cpu(
         .forwardaE(forwardaE), .forwardbE(forwardbE),
         .stallF(stallF), .stallD(stallD), .stallE(stallE),
         .stallM(stallM), .stallW(stallW),
-        .flushD(flushD), .flushE(flushE)
+        .flushD(flushD), .flushE(flushE), .jrD(jrD)
     );
 
 endmodule

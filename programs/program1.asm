@@ -3,7 +3,7 @@
 main:
     li r9, 0        # base pointer = 0
 
-    li r1, 7        # r1 = 7
+    li r1, 5        # r1 = 7
     jal double      # call double
 
     sw r0, 0(r9)    # store return value

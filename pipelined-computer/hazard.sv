@@ -51,7 +51,9 @@ module hazard(
     output logic flushD, flushE,
 
     // stalling for dmem
-    input logic mem_stall
+    input logic mem_stall,
+
+    input logic jrD
 );
 
     // forwarding to EX stage
@@ -71,23 +73,26 @@ module hazard(
         else if (rtE == writeregW && regwriteW) forwardbE = 2'b01; // forward from WB
     end
 
-
     // stall logic
 
-    // if EX is a LW and ID needs that register, we can't forward
-    // LW after something that use loaded value (load-use)
+    // if EX is a LW and ID needs that register, we can't forward yet
     logic lwstall;
-    assign lwstall = memtoregE && (rtE == rsD || rtE == rtD);
+    assign lwstall = memtoregE && (
+        (writeregE == rsD) ||
+        (writeregE == rtD)
+    );
 
-    // branch problems
-    // the values branch need might still be in process...
-    logic branchstall;
-    assign branchstall = (branchD || branchneD) && (
-        // EX stage is writing a register that branch needs
-        (regwriteE && (writeregE == rsD || writeregE == rtD) ||
-        // MEM stage have to load what that branch needs
-        (memtoregM && (writeregM == rsD || writeregM == rtD))
-    ));
+    // branch / jr problems
+    // BEQ, BNE, and JR are resolved in Decode.
+    // If their source register is still being produced, stall.
+    logic controlstall;
+    assign controlstall = (branchD || branchneD || jrD) && (
+        // value is still in EX, cannot forward to Decode yet
+        (regwriteE && ((writeregE == rsD) || (writeregE == rtD))) ||
+
+        // value is a load in MEM; wait until loaded value is available
+        (memtoregM && ((writeregM == rsD) || (writeregM == rtD)))
+    );
 
     always_comb begin
         forwardaD = 1'b0;
@@ -100,20 +105,19 @@ module hazard(
             forwardbD = 1'b1;
     end
 
-    // stall fluch
-    // stall IF and ID when load-use or branch hazard
-    assign stallF = lwstall || branchstall || mem_stall;
-    assign stallD = lwstall || branchstall || mem_stall;
+    // stall IF and ID when load-use or Decode-stage control hazard
+    assign stallF = lwstall || controlstall || mem_stall;
+    assign stallD = lwstall || controlstall || mem_stall;
 
-    // EX/MEM/WB doesn't need to stall
+    // EX/MEM/WB only freeze for memory stall
     assign stallE = mem_stall;
     assign stallM = mem_stall;
     assign stallW = mem_stall;
 
     assign flushD = Exception_Flag && !mem_stall;
 
-    // flushE : bubble into ID/EX
-    assign flushE = (lwstall || branchstall || Exception_Flag) && !mem_stall;
+    // bubble into ID/EX
+    assign flushE = (lwstall || controlstall || Exception_Flag) && !mem_stall;
 
 endmodule
 
