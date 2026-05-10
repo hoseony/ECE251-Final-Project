@@ -4,6 +4,8 @@
 
 ## Overview
 This project implemented a 16-bit pipelined CPU in SystemVerilog, inspired by MIPS architecture and Intel 8080. It follows MIPS style instructions and pipelining structure (IF->ID->EX->ME->WB), and HI/LO for multiplication, with Intel 8080 style accumulator, and flag register.
+YouTube Presetation: https://youtu.be/8YlaXPcAH-8
+
 
 ## Architecture Summary
  
