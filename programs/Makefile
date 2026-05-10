@@ -1,5 +1,8 @@
 # =======================================================
 # ECE251B - Computer Architecture
+# Prof. Rob Marano
+# Author: Hoseon Yu & Evan Dong
+#
 # Programs Makefile
 # =======================================================
 
